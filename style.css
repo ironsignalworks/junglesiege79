@@ -1,47 +1,64 @@
-body {
+/* Global reset and base styles */
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   overflow: hidden;
   font-family: sans-serif;
   background-color: black;
   color: white;
   text-align: center;
+  box-sizing: border-box;
 }
 
+/* Start Screen */
 #start-screen {
   background-image: url('https://i.ibb.co/Wp62RMr6/junglesiege-background.png');
   background-size: cover;
   background-position: center;
   width: 100%;
-  height: 100vh;
+  min-height: 100dvh; /* More reliable on mobile than 100vh */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: 10%;
+  padding-bottom: env(safe-area-inset-bottom, 5vh);
+  padding-top: 5vh;
   position: absolute;
   z-index: 2;
+  box-sizing: border-box;
 }
 
+/* Title */
 #start-screen h1 {
   color: white;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
   font-size: 3rem;
+  margin: 0;
+  padding: 1rem;
 }
 
-#start-button {
-  font-size: 24px;
-  padding: 12px 24px;
-  margin-top: 20px;
+/* Buttons (Start & Restart) */
+#start-button,
+#restart-button {
+  font-size: 3vw;
+  max-width: 80%;
+  padding: 0.2em 0.2em;
+  margin-top: 1em;
   cursor: pointer;
+  background: red;
+  border: 1px solid red;
+  color: white;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 #start-button:hover,
 #restart-button:hover {
   background-color: white;
   color: black;
-  transition: background-color 0.3s, color 0.3s;
 }
 
+/* Canvas */
 canvas {
   display: none;
   background: black;
@@ -51,29 +68,7 @@ canvas {
   display: none;
 }
 
-#end-screen {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: black;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 3;
-}
-
-#end-screen > * {
-  margin: 10px 0;
-}
-
-#restart-button {
-  cursor: pointer;
-  font-size: 24px;
-  padding: 12px 24px;
-  margin-top: 20px;
-}
+/* End Screen */
 #end-screen {
   display: none;
   position: absolute;
@@ -81,7 +76,7 @@ canvas {
   width: 100%; height: 100%;
   color: white;
   text-align: center;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -90,8 +85,7 @@ canvas {
   font-size: 24px;
   z-index: 10;
 }
-#restart-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 20px;
+
+#end-screen > * {
+  margin: 10px 0;
 }

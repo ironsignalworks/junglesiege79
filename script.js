@@ -178,7 +178,6 @@ function showEndScreen(message) {
   bestScoreText.textContent = `Best: ${best}`;
 }
 
-
 function playSound(sound) {
   const sfx = sound.cloneNode();
   sfx.play();
@@ -271,6 +270,7 @@ function gameLoop() {
 
   requestAnimationFrame(gameLoop);
 }
+
 function initializeScreens() {
   startScreen.style.display = "flex";
   endScreen.style.display = "none";

@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+  background-color: black;
+  color: white;
+  text-align: center;
+}
+
+#start-screen {
+  background-image: url('https://i.ibb.co/Wp62RMr6/junglesiege-background.png');
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 10%;
+  position: absolute;
+  z-index: 2;
+}
+
+#start-screen h1 {
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+  font-size: 3rem;
+}
+
+#start-button {
+  font-size: 24px;
+  padding: 12px 24px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+#start-button:hover,
+#restart-button:hover {
+  background-color: white;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+canvas {
+  display: none;
+  background: black;
+}
+
+#gameCanvas {
+  display: none;
+}
+
+#end-screen {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+}
+
+#end-screen > * {
+  margin: 10px 0;
+}
+
+#restart-button {
+  cursor: pointer;
+  font-size: 24px;
+  padding: 12px 24px;
+  margin-top: 20px;
+}
+#end-screen {
+  display: none;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  color: white;
+  text-align: center;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-size: 24px;
+  z-index: 10;
+}
+#restart-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
+}

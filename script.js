@@ -5,10 +5,12 @@ const ctx = canvas.getContext("2d");
 const startScreen = document.getElementById("start-screen");
 const endScreen = document.getElementById("end-screen");
 const startButton = document.getElementById("start-button");
-const restartButton = document.getElementById("restart-button");
 const endMessage = document.getElementById("end-message");
 const finalScoreText = document.getElementById("final-score");
 const bestScoreText = document.getElementById("best-score");
+const gameOverMusic = new Audio("end.mp3"); // or .wav
+const restartButton = document.getElementById("restart-button");
+
 
 // Canvas setup
 canvas.width = window.innerWidth;
@@ -16,6 +18,7 @@ canvas.height = window.innerHeight;
 
 // Game constants and variables
 const maxRounds = 7;
+const bottomBarHeight = 70; // Height of the new stats bar
 
 const tankImg = new Image();
 tankImg.src = "tank.png";
@@ -43,10 +46,12 @@ let health = 100;
 let score = 0;
 let round = 0;
 let gameStarted = false;
+let spawningInProgress = false;
 
 let tank = {
   x: canvas.width / 2 - 40,
-  y: canvas.height - 100,
+  // Adjust initial Y position to be just above the new bottom bar
+  y: canvas.height - bottomBarHeight - 80, 
   width: 80,
   height: 80
 };
@@ -61,6 +66,7 @@ function checkAllImagesLoaded() {
   imagesLoaded++;
   if (imagesLoaded >= totalImages) {
     startButton.disabled = false;
+
   }
 }
 
@@ -80,7 +86,7 @@ startButton.disabled = true;
 startButton.addEventListener("click", () => {
   startScreen.style.display = "none";
   endScreen.style.display = "none";
-  restartButton.style.display = "none";  // hide restart button explicitly
+  restartButton.style.display = "none";
   canvas.style.display = "block";
   gameStarted = true;
   resetGame();
@@ -88,6 +94,8 @@ startButton.addEventListener("click", () => {
   bgm.play();
   nextRound();
   requestAnimationFrame(gameLoop);
+  gameOverMusic.pause();
+  gameOverMusic.currentTime = 0;
 });
 
 restartButton.addEventListener("click", () => {
@@ -99,7 +107,10 @@ restartButton.addEventListener("click", () => {
   nextRound();
   gameStarted = true;
   requestAnimationFrame(gameLoop);
+  gameOverMusic.pause();
+  gameOverMusic.currentTime = 0;
 });
+
 
 // Mouse and touch controls
 canvas.addEventListener("mousemove", e => {
@@ -128,6 +139,8 @@ function resetGame() {
   score = 0;
   round = 0;
   tank.x = canvas.width / 2 - 40;
+  // Also reset the tank's y position to be correct for the current screen size
+  tank.y = canvas.height - bottomBarHeight - tank.height;
 }
 
 function fireBullet() {
@@ -141,31 +154,52 @@ function fireBullet() {
   });
 }
 
-function spawnZombie() {
+function spawnZombie(speed) {
   let x = Math.random() * (canvas.width - 60);
-  zombies.push({ x, y: -60, width: 60, height: 60 });
+  zombies.push({ x, y: -80, width: 60, height: 60, speed });
 }
 
 function nextRound() {
   round++;
+  spawningInProgress = true;
   let bgFile = bgImages[(round - 1) % bgImages.length];
   bgImg.src = bgFile;
 
-  zombies = [];
-  for (let i = 0; i < round * 5; i++) {
-    spawnZombie();
+  const numZombies = Math.floor(5 * round + Math.random() * round * 4);
+  let zombiesToSpawn = numZombies;
+
+  function scheduleNextZombie() {
+    if (zombiesToSpawn <= 0 || !gameStarted) {
+        spawningInProgress = false;
+        return;
+    }
+    const baseSpeed = 1 + round * 0.2;
+    const individualSpeed = baseSpeed + (Math.random() - 0.4) * 0.5;
+    spawnZombie(Math.max(0.5, individualSpeed));
+    zombiesToSpawn--;
+    const baseDelay = 450;
+    const delay = Math.max(80, baseDelay - round * 25);
+    setTimeout(scheduleNextZombie, delay + Math.random() * 150);
   }
+  scheduleNextZombie();
 }
 
 function showEndScreen(message) {
   gameStarted = false;
+
+  // Stop gameplay music
   bgm.pause();
+  bgm.currentTime = 0;
+
+  // Play game over music
+  gameOverMusic.currentTime = 0;
+  gameOverMusic.play();
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(gameOverBg, 0, 0, canvas.width, canvas.height);
 
   endScreen.style.display = "flex";
-  restartButton.style.display = "inline-block"; // show restart button here
+  restartButton.style.display = "inline-block";
 
   endMessage.textContent = message;
   finalScoreText.textContent = `Score: ${score}`;
@@ -183,6 +217,55 @@ function playSound(sound) {
   sfx.play();
 }
 
+/**
+ * NEW: Draws a fixed bar at the bottom of the screen with all game stats.
+ */
+function drawBottomBar() {
+    // Draw the main bar background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, canvas.height - bottomBarHeight, canvas.width, bottomBarHeight);
+
+    // --- Health Section ---
+    ctx.fillStyle = "white";
+    ctx.font = "bold 18px 'Courier New', Courier, monospace";
+    ctx.textAlign = "left";
+    ctx.fillText("HEALTH", 20, canvas.height - bottomBarHeight / 2 + 7);
+
+    const barWidth = 200;
+    const barHeight = 20;
+    const barX = 110;
+    const barY = canvas.height - bottomBarHeight / 2 - (barHeight/2);
+    
+    // Draw health bar background
+    ctx.fillStyle = "#333";
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    // Draw current health
+    const healthPercentage = Math.max(0, health) / 100;
+    const healthBarWidth = barWidth * healthPercentage;
+    if (healthPercentage > 0.6) ctx.fillStyle = "#28a745"; // Green
+    else if (healthPercentage > 0.3) ctx.fillStyle = "#ffc107"; // Yellow
+    else ctx.fillStyle = "#dc3545"; // Red
+    ctx.fillRect(barX, barY, healthBarWidth, barHeight);
+    
+    // Draw health bar border
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(barX, barY, barWidth, barHeight);
+
+    // --- Other Stats (Ammo, Score, Round) ---
+    ctx.fillStyle = "white";
+    ctx.font = "18px 'Courier New', Courier, monospace";
+    
+    // Position stats across the remaining width of the screen
+    const statsXStart = barX + barWidth + 50;
+    const remainingWidth = canvas.width - statsXStart;
+    
+    ctx.fillText(`AMMO: ${ammo}`, statsXStart, canvas.height - bottomBarHeight / 2 + 7);
+    ctx.fillText(`SCORE: ${score}`, statsXStart + remainingWidth * 0.33, canvas.height - bottomBarHeight / 2 + 7);
+    ctx.fillText(`ROUND: ${round}`, statsXStart + remainingWidth * 0.66, canvas.height - bottomBarHeight / 2 + 7);
+}
+
+
 function gameLoop() {
   if (!gameStarted) return;
 
@@ -192,6 +275,7 @@ function gameLoop() {
 
   // Move tank toward pointer
   tank.x += (pointerX - tank.x - tank.width / 2) * 0.1;
+  // Prevent tank from moving off the sides of the screen
   tank.x = Math.max(0, Math.min(canvas.width - tank.width, tank.x));
 
   // Draw tank
@@ -207,15 +291,11 @@ function gameLoop() {
 
   // Update & draw zombies
   zombies.forEach((z, zi) => {
-    z.y += 1 + round * 0.2;
+    z.y += z.speed;
     ctx.drawImage(zombieImg, z.x, z.y, z.width, z.height);
 
     // Collision with tank
-    if (
-      z.x < tank.x + tank.width &&
-      z.x + z.width > tank.x &&
-      z.y + z.height > tank.y
-    ) {
+    if (z.x < tank.x + tank.width && z.x + z.width > tank.x && z.y + z.height > tank.y) {
       zombies.splice(zi, 1);
       health -= 10;
       playSound(fxExplosion);
@@ -223,12 +303,7 @@ function gameLoop() {
 
     // Collision with bullets
     bullets.forEach((b, bi) => {
-      if (
-        b.x > z.x &&
-        b.x < z.x + z.width &&
-        b.y > z.y &&
-        b.y < z.y + z.height
-      ) {
+      if (b.x > z.x && b.x < z.x + z.width && b.y > z.y && b.y < z.y + z.height) {
         playSound(fxExplosion);
         zombies.splice(zi, 1);
         bullets.splice(bi, 1);
@@ -240,26 +315,21 @@ function gameLoop() {
 
   zombies = zombies.filter(z => z.y < canvas.height + 100);
 
-  // HUD
-  ctx.fillStyle = "white";
-  ctx.font = "20px sans-serif";
-  ctx.fillText(`Health: ${health}`, 20, 30);
-  ctx.fillText(`Ammo: ${ammo}`, 20, 60);
-  ctx.fillText(`Score: ${score}`, 20, 90);
-  ctx.fillText(`Round: ${round}`, 20, 120);
+  // **NEW**: Draw the fixed bottom bar on top of everything else
+  drawBottomBar();
 
   // Game over conditions
   if (health <= 0) {
-    showEndScreen("YOU DIED");
+    showEndScreen("ZOMBIES WIN!");
     return;
   }
 
   if (ammo <= 0 && bullets.length === 0) {
-    showEndScreen("OUT OF AMMO");
+    showEndScreen("OUT OF JUICE!");
     return;
   }
 
-  if (zombies.length === 0) {
+  if (zombies.length === 0 && !spawningInProgress) {
     if (round >= maxRounds) {
       showEndScreen("VICTORY!");
       return;

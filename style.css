@@ -1,15 +1,36 @@
+/* Import vintage military-style font */
+@import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap');
+
 /* Global reset and base styles */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: sans-serif;
+  /* Use the new font as the base */
+  font-family: 'Staatliches', cursive;
   background-color: black;
   color: white;
   text-align: center;
   box-sizing: border-box;
 }
+
+/* Add a subtle scanline overlay for a CRT monitor effect */
+body::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.2;
+}
+
 
 /* Start Screen */
 #start-screen {
@@ -17,7 +38,7 @@ html, body {
   background-size: cover;
   background-position: center;
   width: 100%;
-  min-height: 100dvh; /* More reliable on mobile than 100vh */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,33 +50,43 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Title */
+/* Title with glow effect */
 #start-screen h1 {
-  color: white;
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
-  font-size: 3rem;
+  color: #c7ffc7; /* Light green */
+  text-shadow: 
+    0 0 5px #90ff90,
+    0 0 10px #90ff90,
+    0 0 20px #23c483,
+    0 0 30px #23c483;
+  font-size: 4rem;
+  letter-spacing: 2px;
   margin: 0;
   padding: 1rem;
 }
 
-/* Buttons (Start & Restart) */
+/* Buttons (Start & Restart) with military style */
 #start-button,
 #restart-button {
-  font-size: 3vw;
+  font-family: 'Staatliches', cursive;
+  font-size: 2rem;
+  letter-spacing: 1.5px;
   max-width: 80%;
-  padding: 0.2em 0.2em;
+  padding: 0.5em 1em;
   margin-top: 1em;
   cursor: pointer;
-  background: red;
-  border: 1px solid red;
-  color: white;
-  transition: background-color 0.3s, color 0.3s;
+  background: #4B5320; /* Army Olive Drab */
+  border: 2px solid #90ff90; /* Light green border */
+  color: #c7ffc7;
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(144, 255, 144, 0.5);
+  transition: all 0.3s ease;
 }
 
 #start-button:hover,
 #restart-button:hover {
-  background-color: white;
-  color: black;
+  background-color: #90ff90;
+  color: #1a200a;
+  box-shadow: 0 0 25px rgba(144, 255, 144, 0.8);
 }
 
 /* Canvas */
@@ -74,18 +105,18 @@ canvas {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  color: white;
+  color: #c7ffc7;
   text-align: center;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: sans-serif;
   font-size: 24px;
   z-index: 10;
 }
 
 #end-screen > * {
   margin: 10px 0;
+  text-shadow: 0 0 10px #90ff90;
 }

@@ -221,50 +221,54 @@ function playSound(sound) {
  * NEW: Draws a fixed bar at the bottom of the screen with all game stats.
  */
 function drawBottomBar() {
-    // Draw the main bar background
+    // Determine dimensions and scaling based on canvas size
+    const padding = canvas.width * 0.03;
+    const barWidth = canvas.width * 0.4;
+    const barHeight = canvas.height * 0.035;
+    const barX = padding + 90;
+    const barY = canvas.height - bottomBarHeight / 2 - (barHeight / 2);
+    const fontSize = Math.round(canvas.width * 0.035); // e.g., 14–18px on most screens
+
+    // --- Background ---
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, canvas.height - bottomBarHeight, canvas.width, bottomBarHeight);
 
-    // --- Health Section ---
+    // --- Text Base Style ---
     ctx.fillStyle = "white";
-    ctx.font = "bold 18px 'Courier New', Courier, monospace";
+    ctx.font = `bold ${fontSize}px 'Courier New', Courier, monospace`;
     ctx.textAlign = "left";
-    ctx.fillText("HEALTH", 20, canvas.height - bottomBarHeight / 2 + 7);
 
-    const barWidth = 200;
-    const barHeight = 20;
-    const barX = 110;
-    const barY = canvas.height - bottomBarHeight / 2 - (barHeight/2);
-    
-    // Draw health bar background
+    // --- Health Label ---
+    ctx.fillText("HEALTH", padding, canvas.height - bottomBarHeight / 2 + fontSize / 2);
+
+    // --- Health Bar Background ---
     ctx.fillStyle = "#333";
     ctx.fillRect(barX, barY, barWidth, barHeight);
 
-    // Draw current health
+    // --- Health Fill ---
     const healthPercentage = Math.max(0, health) / 100;
     const healthBarWidth = barWidth * healthPercentage;
+
     if (healthPercentage > 0.6) ctx.fillStyle = "#28a745"; // Green
     else if (healthPercentage > 0.3) ctx.fillStyle = "#ffc107"; // Yellow
     else ctx.fillStyle = "#dc3545"; // Red
+
     ctx.fillRect(barX, barY, healthBarWidth, barHeight);
-    
-    // Draw health bar border
+
+    // --- Border ---
     ctx.strokeStyle = "black";
     ctx.strokeRect(barX, barY, barWidth, barHeight);
 
-    // --- Other Stats (Ammo, Score, Round) ---
+    // --- Other Stats ---
     ctx.fillStyle = "white";
-    ctx.font = "18px 'Courier New', Courier, monospace";
-    
-    // Position stats across the remaining width of the screen
-    const statsXStart = barX + barWidth + 50;
-    const remainingWidth = canvas.width - statsXStart;
-    
-    ctx.fillText(`AMMO: ${ammo}`, statsXStart, canvas.height - bottomBarHeight / 2 + 7);
-    ctx.fillText(`SCORE: ${score}`, statsXStart + remainingWidth * 0.33, canvas.height - bottomBarHeight / 2 + 7);
-    ctx.fillText(`ROUND: ${round}`, statsXStart + remainingWidth * 0.66, canvas.height - bottomBarHeight / 2 + 7);
-}
 
+    const spacing = canvas.width * 0.25;
+    const statsY = canvas.height - bottomBarHeight / 2 + fontSize / 2;
+
+    ctx.fillText(`AMMO: ${ammo}`, padding, statsY + barHeight + 8);
+    ctx.fillText(`SCORE: ${score}`, padding + spacing, statsY + barHeight + 8);
+    ctx.fillText(`ROUND: ${round}`, padding + spacing * 2, statsY + barHeight + 8);
+}
 
 function gameLoop() {
   if (!gameStarted) return;

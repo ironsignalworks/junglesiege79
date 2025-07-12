@@ -1,32 +1,95 @@
-/* Import vintage military-style font */
-@import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap');
+/* Import vintage military-style font with fallbacks */
+@import url('https://fonts.googleapis.com/css2?family=Staatliches:wght@400&family=Orbitron:wght@400;700&display=swap');
+
+/* CSS Custom Properties for easy theming */
+:root {
+  --primary-green: #c7ffc7;
+  --secondary-green: #90ff90;
+  --accent-green: #23c483;
+  --dark-green: #4B5320;
+  --darker-green: #1a200a;
+  --glow-color: rgba(144, 255, 144, 0.5);
+  --strong-glow: rgba(144, 255, 144, 0.8);
+  --scanline-opacity: 0.15;
+  --military-font: 'Staatliches', 'Orbitron', 'Arial Black', sans-serif;
+}
 
 /* Global reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: 'Staatliches', cursive;
-  background-color: black;
-  color: white;
+  font-family: var(--military-font);
+  background-color: #000;
+  color: var(--primary-green);
   text-align: center;
-  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
-/* Subtle CRT scanline overlay */
-body::after {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 4px, 3px 100%;
-  z-index: 100;
+/* Enhanced CRT scanline overlay with better performance */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.06),
+      rgba(255, 0, 0, 0.06) 1px,
+      rgba(0, 255, 0, 0.02) 1px,
+      rgba(0, 255, 0, 0.02) 2px,
+      rgba(0, 0, 255, 0.06) 2px,
+      rgba(0, 0, 255, 0.06) 3px
+    );
+  z-index: 1000;
   pointer-events: none;
-  opacity: 0.2;
+  opacity: var(--scanline-opacity);
+  mix-blend-mode: multiply;
+  animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Subtle screen flicker effect */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-green);
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  animation: flicker 4s infinite;
+}
+
+@keyframes flicker {
+  0%, 98% { opacity: 0; }
+  99% { opacity: 0.02; }
+  100% { opacity: 0; }
 }
 
 /* Start Screen */
@@ -34,108 +97,317 @@ body::after {
   background-image: url('https://i.ibb.co/Wp62RMr6/junglesiege-background.png');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   width: 100%;
+  min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: env(safe-area-inset-bottom, 5vh);
+  padding-bottom: max(env(safe-area-inset-bottom), 5vh);
   padding-top: 5vh;
-  position: absolute;
-  z-index: 2;
-  box-sizing: border-box;
+  padding-left: env(safe-area-inset-left, 1rem);
+  padding-right: env(safe-area-inset-right, 1rem);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transition: opacity 0.5s ease-out;
 }
 
-/* Responsive Title */
+#start-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Enhanced Title with better glow effect */
 #start-screen h1 {
-  color: #c7ffc7;
-  text-shadow:
-    0 0 5px #90ff90,
-    0 0 10px #90ff90,
-    0 0 20px #23c483,
-    0 0 30px #23c483;
-  font-size: clamp(2rem, 6vw, 4rem);
-  letter-spacing: 2px;
-  margin: 0;
+  color: var(--primary-green);
+  text-shadow: 
+    0 0 5px var(--secondary-green),
+    0 0 10px var(--secondary-green),
+    0 0 20px var(--accent-green),
+    0 0 30px var(--accent-green),
+    0 0 40px var(--accent-green);
+  font-size: clamp(2rem, 8vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  margin: 0 0 2rem 0;
   padding: 1rem;
   max-width: 90%;
   word-wrap: break-word;
+  text-transform: uppercase;
+  animation: titleGlow 3s ease-in-out infinite alternate;
 }
 
-/* Buttons */
-#start-button,
+@keyframes titleGlow {
+  from {
+    text-shadow: 
+      0 0 5px var(--secondary-green),
+      0 0 10px var(--secondary-green),
+      0 0 20px var(--accent-green),
+      0 0 30px var(--accent-green);
+  }
+  to {
+    text-shadow: 
+      0 0 10px var(--secondary-green),
+      0 0 20px var(--secondary-green),
+      0 0 30px var(--accent-green),
+      0 0 40px var(--accent-green),
+      0 0 50px var(--accent-green);
+  }
+}
+
+/* Enhanced Buttons with better interactions */
+#start-button, 
 #restart-button {
-  font-family: 'Staatliches', cursive;
-  font-size: clamp(1rem, 5vw, 2rem);
-  letter-spacing: 1.5px;
+  font-family: var(--military-font);
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   width: 90%;
   max-width: 320px;
-  padding: 0.75em 1em;
+  padding: 1em 1.5em;
   margin-top: 1em;
   cursor: pointer;
-  background: #4B5320;
-  border: 2px solid #90ff90;
-  color: #c7ffc7;
-  border-radius: 5px;
-  box-shadow: 0 0 15px rgba(144, 255, 144, 0.5);
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--dark-green), #3a4a1a);
+  border: 2px solid var(--secondary-green);
+  color: var(--primary-green);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 15px var(--glow-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+#start-button::before,
+#restart-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
 #start-button:hover,
 #restart-button:hover {
-  background-color: #90ff90;
-  color: #1a200a;
-  box-shadow: 0 0 25px rgba(144, 255, 144, 0.8);
+  background: linear-gradient(135deg, var(--secondary-green), #a0ffa0);
+  color: var(--darker-green);
+  box-shadow: 
+    0 0 25px var(--strong-glow),
+    0 0 35px var(--glow-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px) scale(1.02);
 }
 
-/* Canvas */
-canvas,
+#start-button:hover::before,
+#restart-button:hover::before {
+  left: 100%;
+}
+
+#start-button:active,
+#restart-button:active {
+  transform: translateY(0) scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Canvas styling */
+canvas, 
 #gameCanvas {
   display: none;
-  background: black;
+  background: #000;
   width: 100vw;
   height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
-/* End Screen */
+canvas.active,
+#gameCanvas.active {
+  display: block;
+}
+
+/* End Screen - Simplified */
 #end-screen {
   display: none;
-  position: absolute;
-  top: 0; left: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  background: rgba(0, 0, 0, 0.9);
   color: #c7ffc7;
   text-align: center;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
+  font-size: 1.5rem;
+  z-index: 200;
+  padding: 2rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: clamp(1rem, 4vw, 1.5rem);
-  z-index: 10;
-  padding: 1rem;
 }
 
-#end-screen > * {
-  margin: 10px 0;
-  text-shadow: 0 0 10px #90ff90;
+#end-screen.show {
+  display: flex !important;
 }
 
-/* Mobile tweaks */
-@media (max-width: 480px) {
+/* All text in end screen */
+#end-screen * {
+  color: #c7ffc7 !important;
+  text-shadow: 0 0 10px #90ff90 !important;
+  margin: 10px 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-family: 'Staatliches', cursive !important;
+}
+
+/* Make sure restart button is visible */
+#end-screen button,
+#end-screen #restart-button {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 20px auto !important;
+}
+
+/* Loading indicator */
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid var(--secondary-green);
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
   #start-screen {
     padding-top: 3vh;
-    padding-bottom: 10vh;
+    padding-bottom: max(env(safe-area-inset-bottom), 8vh);
   }
-
+  
   #start-button,
   #restart-button {
     font-size: 1.2rem;
-    padding: 0.5em 0.8em;
+    padding: 0.8em 1.2em;
+    max-width: 280px;
   }
-
+  
   #end-screen {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #start-screen h1 {
+    font-size: clamp(1.5rem, 8vw, 3rem);
+    margin-bottom: 1rem;
+  }
+  
+  #start-button,
+  #restart-button {
+    font-size: 1rem;
+    padding: 0.7em 1em;
+    max-width: 250px;
+  }
+  
+  #end-screen {
+    font-size: 1rem;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+  #start-screen {
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+  }
+  
+  #start-screen h1 {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    margin-bottom: 0.5rem;
+  }
+  
+  #start-button,
+  #restart-button {
+    font-size: 0.9rem;
+    padding: 0.6em 0.8em;
+    margin-top: 0.5em;
+  }
+}
+
+/* High DPI display optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  canvas, #gameCanvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+#start-button:focus-visible,
+#restart-button:focus-visible {
+  outline: 2px solid var(--secondary-green);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  body::before,
+  body::after {
+    display: none;
+  }
+  
+  #start-screen,
+  #end-screen {
+    background: white;
+    color: black;
   }
 }

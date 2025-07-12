@@ -10,7 +10,6 @@ const restartButton = document.getElementById("restart-button");
 const finalScoreText = document.getElementById("final-score");
 const bestScoreText = document.getElementById("best-score");
 
-
 // Validate essential elements
 if (!canvas || !ctx) {
     console.error('Canvas element or 2D context not found!');
@@ -95,7 +94,8 @@ function loadImage(src) {
 
 // Initialize audio resources
 function initializeAudio() {
-    resources.audio.gameOverMusic = createAudio("end.mp3");
+    resources.audio.menuMusic = createAudio("end.mp3");  // Renamed for clarity
+    resources.audio.gameOverMusic = resources.audio.menuMusic;  // Reference the same audio
     resources.audio.bgm = createAudio("bgm_jungle_loop.wav");
     resources.audio.fxShot = createAudio("fx_shot.wav");
     resources.audio.fxExplosion = createAudio("fx_explosion.wav");
@@ -105,36 +105,50 @@ function initializeAudio() {
 async function loadAllResources() {
     try {
         console.log('Loading resources...');
-        
+
         // Initialize audio
         initializeAudio();
-        
+
         // Load essential images
         const imagePromises = [
             loadImage('tank.png').then(img => resources.images.tank = img),
             loadImage('zombie.png').then(img => resources.images.zombie = img),
             loadImage('bg_jungle8.jpg').then(img => resources.images.gameOverBg = img)
         ];
-        
+
         // Load background images
         const bgPromises = bgImages.map(async (src, index) => {
             const img = await loadImage(src);
             resources.images[`bg${index}`] = img;
         });
-        
+
         // Wait for all images to load
         await Promise.all([...imagePromises, ...bgPromises]);
-        
+
+        // Start menu music after all resources load
+        if (resources.audio.menuMusic) {
+            resources.audio.menuMusic.loop = true;
+            try {
+                await resources.audio.menuMusic.play();
+            } catch (e) {
+                console.warn('Menu music autoplay failed:', e);
+            }
+        }
+
+        // Enable UI
         resourcesLoaded = true;
         startButton.disabled = false;
         startButton.textContent = 'START GAME';
+
         console.log('All resources loaded successfully');
-        
+
     } catch (error) {
         console.error('Resource loading failed:', error);
-        startButton.textContent = 'Load Failed - Try Anyway';
+
+        // Allow the game to continue with partial assets
+        resourcesLoaded = true;
         startButton.disabled = false;
-        resourcesLoaded = true; // Allow game to start with fallbacks
+        startButton.textContent = 'Load Failed - Try Anyway';
     }
 }
 
@@ -175,7 +189,7 @@ startButton.addEventListener("click", () => {
     canvas.style.display = "block";
     gameStarted = true;
     resetGame();
-    
+   
     // Start background music safely
     if (resources.audio.bgm) {
         resources.audio.bgm.loop = true;

@@ -17,6 +17,7 @@
 /* Global reset and base styles */
 * {
   box-sizing: border-box;
+  font-family: var(--military-font) !important;
 }
 
 html, body {
@@ -29,9 +30,6 @@ html, body {
   color: var(--primary-green);
   text-align: center;
   user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
 /* Enhanced CRT scanline overlay with better performance */
@@ -92,6 +90,62 @@ body::after {
   100% { opacity: 0; }
 }
 
+/* Game Wrapper */
+#game-wrapper {
+  filter: contrast(1.2) saturate(1.2);
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 50;
+}
+
+/* Canvas styling */
+canvas, 
+#gameCanvas {
+  display: none;
+  background: #000;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+canvas.active,
+#gameCanvas.active {
+  display: block;
+  transform: perspective(800px) scale(1.01) translateZ(0);
+  filter: contrast(1.1) brightness(0.95) saturate(1.2);
+  border-radius: 12px;
+}
+
+#gameCanvas::after {
+  content: "";
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.03),
+    rgba(0, 0, 255, 0.03),
+    rgba(0, 0, 0, 0.02) 4px
+  );
+  mix-blend-mode: screen;
+  z-index: 10;
+  opacity: 0.4;
+}
+
 /* Start Screen */
 #start-screen {
   background-image: url('https://i.ibb.co/Wp62RMr6/junglesiege-background.png');
@@ -100,7 +154,6 @@ body::after {
   background-repeat: no-repeat;
   width: 100%;
   min-height: 100vh;
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -114,6 +167,13 @@ body::after {
   left: 0;
   z-index: 100;
   transition: opacity 0.5s ease-out;
+display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 20px 0;
+}
 }
 
 #start-screen.fade-out {
@@ -121,7 +181,7 @@ body::after {
   pointer-events: none;
 }
 
-/* Enhanced Title with better glow effect */
+/* Title */
 #start-screen h1 {
   color: var(--primary-green);
   text-shadow: 
@@ -159,7 +219,7 @@ body::after {
   }
 }
 
-/* Enhanced Buttons with better interactions */
+/* Buttons */
 #start-button, 
 #restart-button {
   font-family: var(--military-font);
@@ -224,28 +284,7 @@ body::after {
   transition: transform 0.1s ease;
 }
 
-/* Canvas styling */
-canvas, 
-#gameCanvas {
-  display: none;
-  background: #000;
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 50;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-}
-
-canvas.active,
-#gameCanvas.active {
-  display: block;
-}
-
-/* End Screen - Simplified */
+/* End Screen */
 #end-screen {
   display: none;
   position: fixed;
@@ -262,152 +301,15 @@ canvas.active,
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-family: var(--military-font);
 }
 
 #end-screen.show {
   display: flex !important;
 }
 
-/* All text in end screen */
 #end-screen * {
   color: #c7ffc7 !important;
   text-shadow: 0 0 10px #90ff90 !important;
   margin: 10px 0 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  font-family: 'Staatliches', cursive !important;
-}
-
-/* Make sure restart button is visible */
-#end-screen button,
-#end-screen #restart-button {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  margin: 20px auto !important;
-}
-
-/* Loading indicator */
-.loading {
-  position: relative;
-}
-
-.loading::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid var(--secondary-green);
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  #start-screen {
-    padding-top: 3vh;
-    padding-bottom: max(env(safe-area-inset-bottom), 8vh);
-  }
-  
-  #start-button,
-  #restart-button {
-    font-size: 1.2rem;
-    padding: 0.8em 1.2em;
-    max-width: 280px;
-  }
-  
-  #end-screen {
-    font-size: 1.1rem;
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  #start-screen h1 {
-    font-size: clamp(1.5rem, 8vw, 3rem);
-    margin-bottom: 1rem;
-  }
-  
-  #start-button,
-  #restart-button {
-    font-size: 1rem;
-    padding: 0.7em 1em;
-    max-width: 250px;
-  }
-  
-  #end-screen {
-    font-size: 1rem;
-  }
-}
-
-/* Landscape mobile optimization */
-@media (max-height: 500px) and (orientation: landscape) {
-  #start-screen {
-    padding-top: 2vh;
-    padding-bottom: 2vh;
-  }
-  
-  #start-screen h1 {
-    font-size: clamp(1.5rem, 6vw, 2.5rem);
-    margin-bottom: 0.5rem;
-  }
-  
-  #start-button,
-  #restart-button {
-    font-size: 0.9rem;
-    padding: 0.6em 0.8em;
-    margin-top: 0.5em;
-  }
-}
-
-/* High DPI display optimization */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  canvas, #gameCanvas {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: optimize-contrast;
-  }
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  
-  body::before,
-  body::after {
-    animation: none;
-  }
-}
-
-/* Focus styles for keyboard navigation */
-#start-button:focus-visible,
-#restart-button:focus-visible {
-  outline: 2px solid var(--secondary-green);
-  outline-offset: 2px;
-}
-
-/* Print styles */
-@media print {
-  body::before,
-  body::after {
-    display: none;
-  }
-  
-  #start-screen,
-  #end-screen {
-    background: white;
-    color: black;
-  }
 }

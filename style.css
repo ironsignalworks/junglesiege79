@@ -1,7 +1,7 @@
 /* Import vintage military-style font with fallbacks */
-@import url('https://fonts.googleapis.com/css2?family=Staatliches:wght@400&family=Orbitron:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Staatliches&family=Orbitron:wght@400;700&display=swap');
 
-/* CSS Custom Properties for easy theming */
+/* === Root Variables === */
 :root {
   --primary-green: #c7ffc7;
   --secondary-green: #90ff90;
@@ -14,7 +14,7 @@
   --military-font: 'Staatliches', 'Orbitron', 'Arial Black', sans-serif;
 }
 
-/* Global reset and base styles */
+/* === Global Reset & Base === */
 * {
   box-sizing: border-box;
   font-family: var(--military-font) !important;
@@ -25,14 +25,14 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  font-family: var(--military-font);
   background-color: #000;
   color: var(--primary-green);
   text-align: center;
   user-select: none;
+  font-family: var(--military-font);
 }
 
-/* Enhanced CRT scanline overlay with better performance */
+/* === Scanlines Overlay === */
 body::before {
   content: "";
   position: fixed;
@@ -69,7 +69,7 @@ body::before {
   100% { transform: translateY(4px); }
 }
 
-/* Subtle screen flicker effect */
+/* === Subtle Flicker === */
 body::after {
   content: "";
   position: fixed;
@@ -90,7 +90,7 @@ body::after {
   100% { opacity: 0; }
 }
 
-/* Game Wrapper */
+/* === Game Wrapper === */
 #game-wrapper {
   filter: contrast(1.2) saturate(1.2);
   position: fixed;
@@ -102,9 +102,8 @@ body::after {
   z-index: 50;
 }
 
-/* Canvas styling */
-canvas, 
-#gameCanvas {
+/* === Game Canvas === */
+canvas, #gameCanvas {
   display: none;
   background: #000;
   width: 100vw;
@@ -114,7 +113,6 @@ canvas,
   left: 0;
   z-index: 50;
   image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
   image-rendering: crisp-edges;
 }
 
@@ -146,7 +144,7 @@ canvas.active,
   opacity: 0.4;
 }
 
-/* Start Screen */
+/* === Start Screen === */
 #start-screen {
   background-image: url('https://i.ibb.co/Wp62RMr6/junglesiege-background.png');
   background-size: cover;
@@ -157,23 +155,13 @@ canvas.active,
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: max(env(safe-area-inset-bottom), 5vh);
-  padding-top: 5vh;
-  padding-left: env(safe-area-inset-left, 1rem);
-  padding-right: env(safe-area-inset-right, 1rem);
+  justify-content: space-between;
+  padding: 5vh 1rem max(env(safe-area-inset-bottom), 5vh) 1rem;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
   transition: opacity 0.5s ease-out;
-display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100vh;
-  padding: 20px 0;
-}
 }
 
 #start-screen.fade-out {
@@ -181,7 +169,7 @@ display: flex;
   pointer-events: none;
 }
 
-/* Title */
+/* === Title === */
 #start-screen h1 {
   color: var(--primary-green);
   text-shadow: 
@@ -191,7 +179,6 @@ display: flex;
     0 0 30px var(--accent-green),
     0 0 40px var(--accent-green);
   font-size: clamp(2rem, 8vw, 5rem);
-  font-weight: 400;
   letter-spacing: 0.1em;
   margin: 0 0 2rem 0;
   padding: 1rem;
@@ -219,12 +206,11 @@ display: flex;
   }
 }
 
-/* Buttons */
+/* === Buttons === */
 #start-button, 
 #restart-button {
   font-family: var(--military-font);
   font-size: clamp(1rem, 4vw, 1.5rem);
-  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   width: 90%;
@@ -243,7 +229,6 @@ display: flex;
   position: relative;
   overflow: hidden;
   transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 #start-button::before,
@@ -284,7 +269,7 @@ display: flex;
   transition: transform 0.1s ease;
 }
 
-/* End Screen */
+/* === End Screen === */
 #end-screen {
   display: none;
   position: fixed;

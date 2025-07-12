@@ -7,7 +7,6 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
-  /* Use the new font as the base */
   font-family: 'Staatliches', cursive;
   background-color: black;
   color: white;
@@ -15,22 +14,20 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Add a subtle scanline overlay for a CRT monitor effect */
+/* Subtle CRT scanline overlay */
 body::after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 4px, 3px 100%;
-    z-index: 100;
-    pointer-events: none;
-    opacity: 0.2;
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 4px, 3px 100%;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.2;
 }
-
 
 /* Start Screen */
 #start-screen {
@@ -50,32 +47,35 @@ body::after {
   box-sizing: border-box;
 }
 
-/* Title with glow effect */
+/* Responsive Title */
 #start-screen h1 {
-  color: #c7ffc7; /* Light green */
-  text-shadow: 
+  color: #c7ffc7;
+  text-shadow:
     0 0 5px #90ff90,
     0 0 10px #90ff90,
     0 0 20px #23c483,
     0 0 30px #23c483;
-  font-size: 4rem;
+  font-size: clamp(2rem, 6vw, 4rem);
   letter-spacing: 2px;
   margin: 0;
   padding: 1rem;
+  max-width: 90%;
+  word-wrap: break-word;
 }
 
-/* Buttons (Start & Restart) with military style */
+/* Buttons */
 #start-button,
 #restart-button {
   font-family: 'Staatliches', cursive;
-  font-size: 2rem;
+  font-size: clamp(1rem, 5vw, 2rem);
   letter-spacing: 1.5px;
-  max-width: 80%;
-  padding: 0.5em 1em;
+  width: 90%;
+  max-width: 320px;
+  padding: 0.75em 1em;
   margin-top: 1em;
   cursor: pointer;
-  background: #4B5320; /* Army Olive Drab */
-  border: 2px solid #90ff90; /* Light green border */
+  background: #4B5320;
+  border: 2px solid #90ff90;
   color: #c7ffc7;
   border-radius: 5px;
   box-shadow: 0 0 15px rgba(144, 255, 144, 0.5);
@@ -90,13 +90,12 @@ body::after {
 }
 
 /* Canvas */
-canvas {
-  display: none;
-  background: black;
-}
-
+canvas,
 #gameCanvas {
   display: none;
+  background: black;
+  width: 100vw;
+  height: 100vh;
 }
 
 /* End Screen */
@@ -104,7 +103,8 @@ canvas {
   display: none;
   position: absolute;
   top: 0; left: 0;
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   color: #c7ffc7;
   text-align: center;
   background: rgba(0, 0, 0, 0.8);
@@ -112,11 +112,30 @@ canvas {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: clamp(1rem, 4vw, 1.5rem);
   z-index: 10;
+  padding: 1rem;
 }
 
 #end-screen > * {
   margin: 10px 0;
   text-shadow: 0 0 10px #90ff90;
+}
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  #start-screen {
+    padding-top: 3vh;
+    padding-bottom: 10vh;
+  }
+
+  #start-button,
+  #restart-button {
+    font-size: 1.2rem;
+    padding: 0.5em 0.8em;
+  }
+
+  #end-screen {
+    font-size: 1.2rem;
+  }
 }

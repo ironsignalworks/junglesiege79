@@ -192,8 +192,8 @@ canvas.active,
 #start-screen h2 {
   color: #0b3d0b; /* Darker green for text */
   text-shadow: 
+    0 0 5px var(--secondary-green),
     0 0 10px var(--secondary-green),
-    0 0 25px var(--secondary-green),
     0 0 20px var(--accent-green),
     0 0 30px var(--accent-green),
     0 0 40px var(--accent-green);
@@ -201,7 +201,7 @@ canvas.active,
   letter-spacing: 0.1em;
   margin: 0 0 1rem 0;
   padding: 0.5rem;
-  max-width: 90%;
+  max-width: 70%;
   text-align: center;
   text-transform: uppercase;
   animation: titleGlow 3s ease-in-out infinite alternate;
@@ -235,7 +235,7 @@ canvas.active,
   text-transform: uppercase;
   width: 90%;
   max-width: 320px;
-  padding: 1em 1.5em;
+  padding: 0.7em 1.5em;
   margin-top: 3em;
   cursor: pointer;
   background: linear-gradient(135deg, var(--dark-green), #3a4a1a);

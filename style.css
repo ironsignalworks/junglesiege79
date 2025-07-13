@@ -197,8 +197,8 @@ canvas.active,
     0 0 20px var(--accent-green),
     0 0 30px var(--accent-green),
     0 0 40px var(--accent-green);
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  letter-spacing: 0.1em;
+  font-size: clamp(4.5rem, 6vw, 5rem);
+  letter-spacing: 0em;
   margin: 0 0 1rem 0;
   padding: 0.5rem;
   max-width: 70%;

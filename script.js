@@ -17,7 +17,7 @@ if (!canvas || !ctx) {
 }
 
 // Game constants and variables
-const maxRounds = 7;
+const maxRounds = 13;
 let bottomBarHeight = 70; // Will be dynamically adjusted
 
 // Image and audio resources
@@ -28,12 +28,13 @@ const resources = {
 
 const bgImages = [
     "bg_jungle1.png", "bg_jungle2.png", "bg_jungle3.png",
-    "bg_jungle4.png", "bg_jungle5.png", "bg_jungle6.png", "bg_jungle7.png", "bg_jungle8.png", "bg_jungle9.png", "bg_jungle10.png", "bg_jungle11.png", "bg_jungle12.png", "bg_jungle13.png",
+    "bg_jungle4.png", "bg_jungle5.png", "bg_jungle6.png", "bg_jungle7.png", "bg_jungle8.png",
+    "bg_jungle9.png", "bg_jungle10.png", "bg_jungle11.png", "bg_jungle12.png", "bg_jungle13.png",
 ];
 
 let bullets = [];
 let zombies = [];
-let ammo = 50;
+let ammo = 100;
 let health = 100;
 let score = 0;
 let round = 0;
@@ -68,7 +69,7 @@ function createAudio(src) {
     return audio;
 }
 
-// Safe image loading with promises
+// Safe image loading with promises and fallback
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -78,7 +79,7 @@ function loadImage(src) {
         };
         img.onerror = () => {
             console.error(`Failed to load image: ${src}`);
-            // Create a fallback colored rectangle
+            // Create a fallback colored rectangle as a placeholder
             const fallbackCanvas = document.createElement('canvas');
             fallbackCanvas.width = 80;
             fallbackCanvas.height = 80;
@@ -91,6 +92,7 @@ function loadImage(src) {
         img.src = src;
     });
 }
+
 
 // Initialize audio resources
 function initializeAudio() {
@@ -113,7 +115,9 @@ async function loadAllResources() {
         const imagePromises = [
             loadImage('tank.png').then(img => resources.images.tank = img),
             loadImage('zombie.png').then(img => resources.images.zombie = img),
-            loadImage('bg_jungle8.jpg').then(img => resources.images.gameOverBg = img)
+            loadImage('zombie2.png').then(img => resources.images.zombie2 = img),
+
+            loadImage('gameover.png').then(img => resources.images.gameOverBg = img)
         ];
 
         // Load background images
@@ -291,21 +295,86 @@ function fireBullet() {
         width: 4,
         height: 10
     });
+
+    }
+
+function isColliding(a, b) {
+  return (
+    a.x < b.x + b.width &&
+    a.x + a.width > b.x &&
+    a.y < b.y + b.height &&
+    a.y + a.height > b.y
+  );
+
 }
 
+// Array to hold zombies
+
+// Your canvas and context assumed already defined:
+// const canvas = document.getElementById('gameCanvas');
+// const ctx = canvas.getContext('2d');
+
 function spawnZombie(speed) {
-    const zombieWidth = 60;
-    const zombieHeight = 60;
+    // Decide which zombie type to spawn
+    // After round 3, 40% chance to spawn the stronger zombie2
+    let type = "zombie";
+    if (round > 3 && Math.random() < 0.4) {
+        type = "zombie2";
+    }
+
+    // Set size and health based on zombie type
+    let zombieWidth = type === "zombie2" ? 70 : 60;
+    let zombieHeight = type === "zombie2" ? 70 : 60;
+    let zombieHealth = type === "zombie2" ? 3 : 1;
+
+    // Random horizontal spawn position, starting above screen (y is negative)
     let x = Math.random() * (canvas.width - zombieWidth);
-    
+
+    // Add new zombie to the array
     zombies.push({ 
         x, 
         y: -zombieHeight, 
         width: zombieWidth, 
         height: zombieHeight, 
-        speed: Math.max(0.5, speed)
+        speed: Math.max(0.5, speed),
+        type,
+        health: zombieHealth
     });
 }
+
+function drawZombie(z) {
+    // If zombie2, add a green glowing shadow
+    if (z.type === "zombie2") {
+        ctx.shadowColor = 'rgba(0, 255, 0, 0.7)';
+        ctx.shadowBlur = 15;
+    } else {
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+    }
+    
+    // Draw the zombie image
+    ctx.drawImage(resources.images[z.type], z.x, z.y, z.width, z.height);
+    
+    // Reset shadow so it doesn't affect other drawings
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+}
+
+// Example render loop snippet that draws all zombies
+function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    for (let z of zombies) {
+        drawZombie(z);
+    }
+    
+    // Call next frame
+    requestAnimationFrame(render);
+}
+
+// Usage example:
+// spawnZombie(1);
+// render();
 
 function nextRound() {
     if (!gameStarted) return;
@@ -485,7 +554,6 @@ function gameLoop(currentTime) {
     if (bgImage) {
         ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
     } else {
-        // Fallback gradient background
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, '#87CEEB');
         gradient.addColorStop(1, '#228B22');
@@ -496,15 +564,12 @@ function gameLoop(currentTime) {
     // Move tank toward pointer with smooth interpolation
     const targetX = pointerX - tank.width / 2;
     tank.x += (targetX - tank.x) * 0.1;
-    
-    // Keep tank within bounds
     tank.x = Math.max(0, Math.min(canvas.width - tank.width, tank.x));
     
     // Draw tank
     if (resources.images.tank) {
         ctx.drawImage(resources.images.tank, tank.x, tank.y, tank.width, tank.height);
     } else {
-        // Fallback tank
         ctx.fillStyle = "#4CAF50";
         ctx.fillRect(tank.x, tank.y, tank.width, tank.height);
     }
@@ -517,20 +582,26 @@ function gameLoop(currentTime) {
         ctx.fillRect(b.x, b.y, b.width, b.height);
     });
     
-    // Update and draw zombies
+    // Update, draw zombies and handle collisions
     for (let zi = zombies.length - 1; zi >= 0; zi--) {
         const z = zombies[zi];
         z.y += z.speed;
         
-        // Draw zombie
-        if (resources.images.zombie) {
-            ctx.drawImage(resources.images.zombie, z.x, z.y, z.width, z.height);
-        } else {
-            // Fallback zombie
-            ctx.fillStyle = "#F44336";
-            ctx.fillRect(z.x, z.y, z.width, z.height);
+        // Remove zombie if off bottom of canvas
+        if (z.y > canvas.height) {
+            zombies.splice(zi, 1);
+            continue;
         }
-        
+         // Draw zombie based on type
+    if (z.type === "zombie2" && resources.images.zombie2) {
+        ctx.drawImage(resources.images.zombie2, z.x, z.y, z.width, z.height);
+    } else if (resources.images.zombie) {
+        ctx.drawImage(resources.images.zombie, z.x, z.y, z.width, z.height);
+    } else {
+        // Fallback colors
+        ctx.fillStyle = z.type === "zombie2" ? "#8B0000" : "#F44336";
+        ctx.fillRect(z.x, z.y, z.width, z.height);
+    }
         // Collision with tank
         if (checkCollision(z, tank)) {
             zombies.splice(zi, 1);
@@ -539,22 +610,35 @@ function gameLoop(currentTime) {
             continue;
         }
         
-        // Collision with bullets
-        for (let bi = bullets.length - 1; bi >= 0; bi--) {
-            const b = bullets[bi];
-            if (checkCollision(b, z)) {
-                playSound(resources.audio.fxExplosion);
-                zombies.splice(zi, 1);
-                bullets.splice(bi, 1);
-                score++;
-                ammo++;
-                break;
-            }
+       // Collision with bullets
+for (let i = bullets.length - 1; i >= 0; i--) {
+    const bullet = bullets[i];
+    if (isColliding(bullet, z)) {
+        z.health--;
+        bullets.splice(i, 1); // Remove bullet on hit
+
+        if (z.health <= 0) {
+            zombies.splice(zi, 1);
+            score += z.type === "zombie2" ? 15 : 5;
+
+            // Reward ammo on zombie kill (e.g., +5, max 100)
+            ammo = Math.min(ammo + 2, 150);
+
+            playSound(resources.audio.fxExplosion);
+        }
+
+        break; // Stop checking bullets after hit
+    }
+}
+
+        // Draw zombie
+        if (resources.images.zombie) {
+            ctx.drawImage(resources.images.zombie, z.x, z.y, z.width, z.height);
+        } else {
+            ctx.fillStyle = "#F44336";
+            ctx.fillRect(z.x, z.y, z.width, z.height);
         }
     }
-    
-    // Remove zombies that have gone off screen
-    zombies = zombies.filter(z => z.y < canvas.height + 100);
     
     // Draw bottom bar
     drawBottomBar();
@@ -580,6 +664,7 @@ function gameLoop(currentTime) {
         }
     }
     
+    // Request next frame
     requestAnimationFrame(gameLoop);
 }
 
@@ -588,46 +673,41 @@ function cleanupGame() {
     gameStarted = false;
     bullets.length = 0;
     zombies.length = 0;
-    
+
     if (resources.audio.bgm) {
         resources.audio.bgm.pause();
         resources.audio.bgm.currentTime = 0;
     }
-    
+
     if (resources.audio.gameOverMusic) {
         resources.audio.gameOverMusic.pause();
         resources.audio.gameOverMusic.currentTime = 0;
     }
+    
+    // Optional: Reset gameplay state
+    // score = 0;
+    // round = 1;
+    // health = 100;
 }
 
-// Initialize screens
 function initializeScreens() {
-    startScreen.style.display = "flex";
-    endScreen.style.display = "column";
-    canvas.style.display = "center";
+    if (startScreen) startScreen.style.display = "flex";
+    if (endScreen) endScreen.style.display = "none";
+    if (canvas) canvas.style.display = "block";
+
     gameStarted = false;
-canvas.style.zIndex = '1';
-endScreen.style.zIndex = '10';
+
+    if (canvas) canvas.style.zIndex = '1';
+    if (endScreen) endScreen.style.zIndex = '10';
 }
 
-// Initialize everything
 function initialize() {
     console.log('Initializing game...');
-    
-    // Set up canvas
     updateCanvasSize();
-    
-    // Initialize screens
     initializeScreens();
-    
-    // Load all resources
     loadAllResources();
-    
     console.log('Game initialized');
 }
 
-// Handle page unload
 window.addEventListener('beforeunload', cleanupGame);
-
-// Start initialization
 initialize();

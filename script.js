@@ -27,8 +27,8 @@ const resources = {
 };
 
 const bgImages = [
-    "bg_jungle1.jpg", "bg_jungle2.jpg", "bg_jungle3.jpg",
-    "bg_jungle4.jpg", "bg_jungle5.jpg", "bg_jungle6.jpg", "bg_jungle7.jpg"
+    "bg_jungle1.png", "bg_jungle2.png", "bg_jungle3.png",
+    "bg_jungle4.png", "bg_jungle5.png", "bg_jungle6.png", "bg_jungle7.png", "bg_jungle8.png", "bg_jungle9.png", "bg_jungle10.png", "bg_jungle11.png", "bg_jungle12.png", "bg_jungle13.png"
 ];
 
 let bullets = [];

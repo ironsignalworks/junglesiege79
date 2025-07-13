@@ -147,11 +147,12 @@ canvas.active,
 /* === Start Screen === */
 #start-screen {
   background-image: url('https://i.ibb.co/HfV38CwD/download-6-1.png');
-  background-size: cover;
-  background-position: center;
+ background-size: cover; /* or try 'contain' if you want no cropping at all */
+  background-position: center center;
   background-repeat: no-repeat;
-  width: 100%;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,7 +178,7 @@ canvas.active,
     0 0 20px var(--accent-green),
     0 0 30px var(--accent-green),
     0 0 40px var(--accent-green);
-  font-size: clamp(0.5rem, 8vw, 5rem);
+  font-size: clamp(0.3rem, 8vw, 5rem);
   letter-spacing: 0.1em;
   margin: 0 0 2rem 0;
   padding: 1rem;
@@ -196,7 +197,7 @@ canvas.active,
     0 0 20px var(--accent-green),
     0 0 30px var(--accent-green),
     0 0 40px var(--accent-green);
-  font-size: clamp(3.5rem, 6vw, 5rem);
+  font-size: clamp(2.5rem, 6vw, 5rem);
   letter-spacing: 0.1em;
   margin: 0 0 1rem 0;
   padding: 0.5rem;
@@ -234,7 +235,7 @@ canvas.active,
   text-transform: uppercase;
   width: 90%;
   max-width: 320px;
-  padding: 0.5em 1.5em;
+  padding: 1em 1.5em;
   margin-top: 3em;
   cursor: pointer;
   background: linear-gradient(135deg, var(--dark-green), #3a4a1a);

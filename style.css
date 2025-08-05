@@ -254,8 +254,8 @@ canvas.active {
   text-transform: uppercase;
   width: 90%;
   max-width: 250px;
-  padding: -0.7em 1.5em;
-  margin-top: 15em;
+  padding: -4em 1.5em;
+  margin-top: 10em;
   cursor: pointer;
   background: linear-gradient(135deg, var(--dark-green), #3a4a1a);
   border: 3px solid var(--secondary-green);

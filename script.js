@@ -277,54 +277,66 @@ function playSound(sound) {
 }
 
 function drawBottomBar() {
+  // Background bar
   const padding = Math.max(10, canvas.width * 0.02);
-  const barWidth = Math.min(300, canvas.width * 0.4);
-  const barHeight = Math.max(20, canvas.height * 0.025);
-  const barX = padding + Math.max(70, canvas.width * 0.08);
-  const barY = canvas.height - bottomBarHeight / 2 - (barHeight / 2);
-  const fontSize = Math.max(12, Math.min(20, canvas.width * 0.028));
+  const barWidth = 130;
+  const barHeight = Math.max(18, canvas.height * 0.023);
+  const bottomY = canvas.height - bottomBarHeight;
 
-  // Bar background
   ctx.fillStyle = 'rgba(0, 0, 0, 0.82)';
-  ctx.fillRect(0, canvas.height - bottomBarHeight, canvas.width, bottomBarHeight);
+  ctx.fillRect(0, bottomY, canvas.width, bottomBarHeight);
 
-  // Health bar
+  // Arcade font settings
+  const fontSize = Math.max(12, Math.min(20, canvas.width * 0.028));
+  ctx.font = `bold ${fontSize}px 'VT323', 'Orbitron', monospace`;
+  ctx.fillStyle = "white";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+
+  // --- HEALTH LABEL AND BAR ---
+  const label = (canvas.width < 500) ? "HP" : "HEALTH";
+  const labelX = padding;
+  const labelY = bottomY + 6;
+  ctx.fillText(label, labelX, labelY);
+
+  // Horizontal space between label and bar
+  const labelWidth = ctx.measureText(label).width;
+  const labelMargin = 18; // Tweak for more/less space
+
+  // Health bar placement
+  const barX = labelX + labelWidth + labelMargin;
+  const barY = labelY - 1;
+
   ctx.fillStyle = "#333";
   ctx.fillRect(barX, barY, barWidth, barHeight);
+
   const healthPercentage = Math.max(0, Math.min(100, health)) / 100;
   const healthBarWidth = barWidth * healthPercentage;
-  ctx.fillStyle = healthPercentage > 0.6 ? "#4CAF50" :
-                  healthPercentage > 0.3 ? "#FF9800" : "#F44336";
+  ctx.fillStyle = healthPercentage > 0.6 ? "#4CAF50" : healthPercentage > 0.3 ? "#FF9800" : "#F44336";
   ctx.fillRect(barX, barY, healthBarWidth, barHeight);
+
   ctx.strokeStyle = "white";
   ctx.lineWidth = 2;
   ctx.strokeRect(barX, barY, barWidth, barHeight);
 
-  // Arcade font
-  ctx.font = `bold ${fontSize}px 'VT323', 'Orbitron', monospace`;
-  ctx.fillStyle = "white";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
+  // --- STATS (to the right of bar) ---
+  let x = barX + barWidth + 28; // 28px margin after health bar
+  const y = labelY;
 
-  // Make sure text is always above the bar
-  const y = barY - Math.max(10, fontSize * 0.7);
-
-  let x = padding;
   function stat(label, value) {
     ctx.fillText(`${label}${value !== undefined ? ': ' + value : ''}`, x, y);
     x += ctx.measureText(`${label}${value !== undefined ? ': ' + value : ''}  `).width;
   }
-
   const short = canvas.width < 500;
-  stat(short ? "HP" : "HEALTH");
+
   stat(short ? "AM" : "AMMO", ammo);
   stat("SCORE", score);
   stat(short ? "RD" : "ROUND", round);
-  stat(short ? "EN" : "BOSS INCOMING", bossTriggerCount > 0 ? bossTriggerCount : 0);
+  stat(short ? "EN" : "ENEMIES", bossTriggerCount > 0 ? bossTriggerCount : 0);
 
-  // FPS COUNTER
+  // FPS (move up if mobile so not covered by thumb UI)
   if (fps > 0) {
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
     ctx.font = `${Math.round(fontSize * 0.7)}px 'VT323', 'Orbitron', monospace`;
     if (canvas.width > 600) {
       ctx.fillText(`FPS: ${fps}`, canvas.width - 80, canvas.height - 10);

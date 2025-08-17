@@ -29,7 +29,6 @@ html, body {
   color: var(--primary-green);
   text-align: center;
   user-select: none;
-  font-family: var(--military-font);
 }
 
 /* === Scanlines Overlay === */
@@ -90,36 +89,22 @@ body::after {
   100% { opacity: 0; }
 }
 
-/* === Game Wrapper === */
-#game-wrapper {
-  filter: contrast(1.2) saturate(1.2);
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  z-index: 50;
-}
-
 /* === Game Canvas === */
 canvas#gameCanvas {
-  display: none;
+  display: none; /* JS toggles visibility */
   position: fixed;
   top: 0;
   left: 0;
-  background: #000;
   width: 100vw;
   height: 100vh;
+  background: #000;
   z-index: 50;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   cursor: crosshair;
 }
 
-canvas.active {
-  display: block;
-}
+canvas#gameCanvas.active { display: block; }
 
 /* === Start Screen === */
 #start-screen {
@@ -142,10 +127,7 @@ canvas.active {
   transition: opacity 0.5s ease-out;
 }
 
-#start-screen.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
+#start-screen.fade-out { opacity: 0; pointer-events: none; }
 
 #start-screen h1 {
   color: var(--primary-green);
@@ -205,7 +187,7 @@ canvas.active {
 
 /* === End Screen === */
 #end-screen {
-  display: none;
+  display: none; /* JS toggles */
   position: absolute;
   top: 0;
   left: 0;
@@ -219,21 +201,24 @@ canvas.active {
   align-items: center;
   font-size: 34px;
   z-index: 200;
+  justify-content: flex-start;
+  padding-top: 40vh; /* push content down */
 }
 
 #end-message {
-    font-size: clamp(3rem, 8vw, 6rem);
-    text-transform: uppercase;
-    color: #ff4d4d;
-    text-shadow: 0 0 15px #ff0000;
+  font-size: clamp(3rem, 8vw, 6rem);
+  text-transform: uppercase;
+  color: #ff4d4d;
+  text-shadow: 0 0 15px #ff0000;
+  margin-top: 0;
 }
 
 #final-score, #best-score {
-    margin-top: 10px;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-top: 10px;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
 
-/* === In-Game UI === */
+/* === In-Game UI (optional wrapper) === */
 #game-ui {
   position: fixed;
   top: 10px;
@@ -249,12 +234,12 @@ canvas.active {
 #start-button,
 #restart-button {
   font-family: var(--military-font);
-  font-size: clamp(2rem, 4vw, 1.5rem);
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   width: 90%;
   max-width: 250px;
-  padding: -4em 1.5em;
+  padding: 1em 1.5em;
   margin-top: 10em;
   cursor: pointer;
   background: linear-gradient(135deg, var(--dark-green), #3a4a1a);
@@ -271,10 +256,10 @@ canvas.active {
 }
 
 #start-button:disabled {
-    cursor: wait;
-    background: #555;
-    color: #999;
-    border-color: #777;
+  cursor: wait;
+  background: #555;
+  color: #999;
+  border-color: #777;
 }
 
 #start-button::before,
@@ -285,11 +270,7 @@ canvas.active {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   transition: left 0.5s ease;
 }
 
@@ -301,6 +282,10 @@ canvas.active {
 }
 
 #start-button:not(:disabled):hover::before,
-#restart-button:hover::before {
-  left: 100%;
-}
+#restart-button:hover::before { left: 100%; }
+
+/* Hidden gameover img (referenced by JS) */
+#gameover-img { display:none; }
+
+/* Boss announcement ensures flex is applied */
+#boss-announcement { display: none; align-items: center; justify-content: center; }

@@ -2,82 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Jungle Siege '79</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css?family=VT323|Orbitron:700&display=swap" rel="stylesheet">
-
-
-  <meta property="og:title" content="Jungle Siege '79" />
-  <meta property="og:description" content="A nightmare jungle assault from Iron Signal Works." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://ironsignalworks.github.io/junglesiege79/" />
-  <meta property="og:image" content="https://i.ibb.co/wrs56dmm/Chat-GPT-Image-Aug-5-2025-03-24-51-PM.png" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Jungle Siege '79" />
-  <meta name="twitter:description" content="A nightmare jungle assault from Iron Signal Works." />
-  <meta name="twitter:image" content="https://i.ibb.co/wrs56dmm/Chat-GPT-Image-Aug-5-2025-03-24-51-PM.png" />
+  <link href="https://fonts.googleapis.com/css?family=VT323|Orbitron:700|Staatliches&display=swap" rel="stylesheet" />
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#000; }
+    #start-screen, #end-screen, #boss-announcement {
+      position: fixed; inset: 0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+    }
+    #gameCanvas {
+      position: fixed; inset: 0;
+      width: 100vw; height: 100vh; display:none;
+      image-rendering: pixelated; image-rendering: crisp-edges;
+    }
+  </style>
 </head>
-
 <body>
   <!-- Start Screen -->
   <div id="start-screen">
     <h1></h1>
     <h2></h2>
-    <button id="start-button" disabled>Loading Assets...</button>
+    <button id="start-button" disabled>LOADING...</button>
   </div>
 
   <!-- Boss Announcement Overlay -->
-  <div id="boss-announcement" style="
-    display:none;
-    position:absolute;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.88);
-    color: #f03030;
-    font-family: 'Staatliches', 'Orbitron', Arial Black, sans-serif;
-    font-size: 48px;
-    z-index: 99;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-shadow: 0 0 12px #fff, 0 0 6px #900;
-  ">
-    <div id="boss-announcement-title">BOSS INCOMING ></div>
+  <div id="boss-announcement" style="display:none;color:#f03030;font-size:48px;text-shadow:0 0 12px #fff,0 0 6px #900;">
+    <div id="boss-announcement-title">BOSS INCOMING &gt;</div>
     <div id="boss-announcement-name" style="font-size:58px;margin-top:30px;"></div>
   </div>
 
   <!-- Game Canvas -->
-  <canvas id="gameCanvas" width="800" height="600" style="display:none;"></canvas>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <!-- Optional gameover image -->
+  <img id="gameover-img" src="assets/images/gameover.png" alt="game over" style="display:none; position:absolute; left:-9999px;" />
 
   <!-- End Screen -->
-  <div id="end-screen" style="
-    display:none; 
-    position:absolute; 
-    top:0; 
-    left:0; 
-    width:100%; 
-    height:100%; 
-    color:white; 
-    text-align:center; 
-    background: rgba(0,0,0,0.4); 
-    display:flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
-    font-family:sans-serif; 
-    font-size:34px; 
-    z-index:10;
-  ">
+  <div id="end-screen" style="display:none;color:white;text-align:center;background:rgba(0,0,0,0.4);font-family:sans-serif;font-size:34px;z-index:10;">
     <div id="end-message"></div>
-    <div id="final-score" style="margin-top: 10px;"></div>
-    <div id="best-score" style="margin-top: 5px;"></div>
-    <button id="restart-button" style="margin-top: 20px; padding: 10px 20px; font-size: 20px;">Restart</button>
+    <div id="final-score" style="margin-top:10px;"></div>
+    <div id="best-score" style="margin-top:5px;"></div>
+    <button id="restart-button" style="margin-top:20px;padding:10px 20px;font-size:20px;">Restart</button>
   </div>
 
-<script type="module" src="script.js"></script>
+  <!-- Main module -->
+  <script type="module" src="./src/main.js"></script>
 
+  <!-- Tiny diagnostic if module fails to load -->
+  <script>
+    window.addEventListener('error', (e) => {
+      if (String(e?.message || '').includes('Failed to load module script')) {
+        const box = document.createElement('div');
+        box.style.cssText =
+          'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);font:14px monospace;color:#ff6b6b;background:#000a;padding:8px 12px;border:1px solid #ff6b6b;border-radius:8px;z-index:999999;';
+        box.textContent = 'ERROR: Could not load ./src/main.js — check path/case and serve via http:// (not file://)';
+        document.body.appendChild(box);
+      }
+    });
+  </script>
 </body>
 </html>
